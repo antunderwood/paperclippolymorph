@@ -1,0 +1,19 @@
+PaperclipPolymorph
+==========================
+
+This plugin allows users of the Paperclip plugin to easily share attached files between 
+multiple models. Essentially, polymorphic paperclip transparently saves the attached files
+into a separate asset's table and associates the the model to the asset through a polymorphic
+_attachings_ table.
+
+The Paperclip Plugin must also be installed for PolyMorphicPaperclip to work.
+Get paperclip here:
+http://thoughtbot.com/projects/paperclip
+
+Example
+=======
+class Essay < ActiveRecord::Base
+  acts_as_polymorphic_paperclip
+end
+
+Copyright (c) 2008 PolymorphicPaperclip Mark Daggett, released under the MIT license
