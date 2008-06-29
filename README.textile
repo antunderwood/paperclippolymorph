@@ -12,20 +12,25 @@ http://thoughtbot.com/projects/paperclip
 
 h3. Example
 
+<pre>
 class PhotoEssay < ActiveRecord::Base
   acts_as_polymorphic_paperclip
 end
-
+</pre>
 You can also add a counter_cache to your model if you wish.
+<pre>
 class Essay < ActiveRecord::Base
   acts_as_polymorphic_paperclip :counter_cache => true
 end
 
 @essay.assets.attach(@asset)
 @essay.assets.detach -or- @essay.assets.detach(@asset)
+</pre>
 
 h4. Helper methods
-There is one helper method so far used to determine if the asset can be displayed in a browser
-@essay.assets.first.browser_safe? # => returns true or false
 
+There is one helper method so far used to determine if the asset can be displayed in a browser
+<pre>
+@essay.assets.first.browser_safe? # => returns true or false
+</pre>
 Copyright (c) 2008 PolymorphicPaperclip Mark Daggett, released under the MIT license
