@@ -18,7 +18,7 @@ class Asset < ActiveRecord::Base
   end
   
   def browser_safe?
-    %w(jpg gif png).include?(url.split('.').last.downcase)
+    %w(jpg gif png).include?(url.split('.').last.sub(/\?.+/, "").downcase)
   end
   alias_method :web_safe?, :browser_safe?
   
