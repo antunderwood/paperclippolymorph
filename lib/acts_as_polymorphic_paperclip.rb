@@ -53,18 +53,28 @@ module LocusFocus
         def after_save
           super
           Asset.transaction do
-            the_asset = Asset.find_or_initialize_by_data_file_name(self.data.original_filename)
-            the_asset.data = data
-            if the_asset.save
-      
-              # This association may be saved more than once within the same request / response 
-              # cycle, which leads to needless DB calls. Now we'll clear out the data attribute
-              # once the record is successfully saved any subsequent calls will be ignored.
-              data = nil
-              Attaching.find_or_create_by_asset_id_and_attachable_type_and_attachable_id(:asset_id => the_asset.id, :attachable_type => self.class.to_s, :attachable_id => self.id)
-              assets(true) # implicit reloading
+            if data.is_a?(Array)
+              data.each do |data_item|
+                create_and_save_asset(data_item)
+              end
+            else
+              create_and_save_asset(data)
             end
           end unless data.nil? || data.blank?
+        end
+        
+        def create_and_save_asset(data_item)
+          the_asset = Asset.find_or_initialize_by_data_file_name(data_item.original_filename)
+          the_asset.data = data_item
+          if the_asset.save
+  
+            # This association may be saved more than once within the same request / response 
+            # cycle, which leads to needless DB calls. Now we'll clear out the data attribute
+            # once the record is successfully saved any subsequent calls will be ignored.
+            data_item = nil
+            Attaching.find_or_create_by_asset_id_and_attachable_type_and_attachable_id(:asset_id => the_asset.id, :attachable_type => self.class.to_s, :attachable_id => self.id)
+            assets(true) # implicit reloading
+          end
         end
       end
     end
