@@ -4,7 +4,7 @@ class <%= migration_name %> < ActiveRecord::Migration
       t.string   "data_file_name"
       t.string   "data_content_type"
       t.integer  "data_file_size"
-      t.integer  "assets_count", :default => 0
+      t.integer  "attachings_count", :default => 0
       t.datetime "created_at"
       t.datetime "updated_at"
     end
