@@ -25,11 +25,19 @@ module LocusFocus
               @owner.assets(true)
             end
             
-            def detach(asset_id)
+            def detach(asset_id, delete_if_no_attachings = false)
               asset_id = extract_id(asset_id)
               attaching = @owner.attachings.find(:first, :conditions => ['asset_id = ?', asset_id])
               raise ActiveRecord::RecordNotFound unless attaching
               attaching.destroy
+              
+              asset = Asset.find(asset_id)
+              if asset.attachings.empty? && delete_if_no_attachings# delete if no longer attached to anything
+                logger.info(asset.data_file_name)
+                asset.data.send(:queue_existing_for_delete)
+                asset.data.send(:flush_deletes)
+                asset.save # needed to permanently remove file name and urls 
+              end
             end
             
             protected
@@ -55,7 +63,7 @@ module LocusFocus
           Asset.transaction do
             if data.is_a?(Array)
               data.each do |data_item|
-                create_and_save_asset(data_item)
+                create_and_save_asset(data_item) unless data_item.nil? || data_item.blank?
               end
             else
               create_and_save_asset(data)
