@@ -16,7 +16,7 @@ ActiveRecord::Schema.define(:version => 0) do
     t.integer  "data_file_size"
     t.integer  "attachings_count", :default => 0
     t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "data_updated_at"
     t.integer  "account_id"
   end
 

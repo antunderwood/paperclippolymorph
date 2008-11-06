@@ -33,7 +33,6 @@ module LocusFocus
               
               asset = Asset.find(asset_id)
               if asset.attachings.empty? && delete_if_no_attachings# delete if no longer attached to anything
-                logger.info(asset.data_file_name)
                 asset.data.send(:queue_existing_for_delete)
                 asset.data.send(:flush_deletes)
                 asset.save # needed to permanently remove file name and urls 
