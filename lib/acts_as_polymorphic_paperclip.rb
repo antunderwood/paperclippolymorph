@@ -12,7 +12,8 @@ module LocusFocus
         # http://www.thoughtbot.com/projects/paperclip
         def acts_as_polymorphic_paperclip(options = {})
           write_inheritable_attribute(:acts_as_polymorphic_paperclip_options, {
-            :counter_cache => options[:counter_cache]
+            :counter_cache => options[:counter_cache],
+            :styles => options[:styles]
           })
           class_inheritable_reader :acts_as_polymorphic_paperclip_options
 
@@ -72,6 +73,8 @@ module LocusFocus
         
         def create_and_save_asset(data_item)
           the_asset = Asset.find_or_initialize_by_data_file_name(data_item.original_filename)
+          logger.info("[ACTS AS] #{data_item.inspect}")
+          the_asset.data.instance_variable_set("@styles",acts_as_polymorphic_paperclip_options[:styles]) unless acts_as
           the_asset.data = data_item
           if the_asset.save
   
