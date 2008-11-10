@@ -1,10 +1,10 @@
 class Asset < ActiveRecord::Base
   has_many :attachings, :dependent => :destroy
   has_attached_file :data,
-                    :styles => { :tiny   => "64x64#",
-                                 :small  => "176x112#",
+                    :styles => { :tiny => "64x64#",
+                                 :small => "176x112#",
                                  :medium => "630x630>",
-                                 :large  => "1024x1024>" }
+                                 :large => "1024x1024>" }
   def url(*args)
     data.url(*args)
   end

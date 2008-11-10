@@ -29,11 +29,14 @@ module LocusFocus
             def detach(asset_id, delete_if_no_attachings = false)
               asset_id = extract_id(asset_id)
               attaching = @owner.attachings.find(:first, :conditions => ['asset_id = ?', asset_id])
+              attachable = attaching.attachable
               raise ActiveRecord::RecordNotFound unless attaching
               attaching.destroy
               
               asset = Asset.find(asset_id)
               if asset.attachings.empty? && delete_if_no_attachings# delete if no longer attached to anything
+                override_default_styles, normalised_styles = attachable.override_default_styles?(asset.name)
+                asset.data.instance_variable_set("@styles", normalised_styles) if override_default_styles
                 asset.data.send(:queue_existing_for_delete)
                 asset.data.send(:flush_deletes)
                 asset.save # needed to permanently remove file name and urls 
@@ -73,8 +76,8 @@ module LocusFocus
         
         def create_and_save_asset(data_item)
           the_asset = Asset.find_or_initialize_by_data_file_name(data_item.original_filename)
-          logger.info("[ACTS AS] #{data_item.inspect}")
-          the_asset.data.instance_variable_set("@styles",acts_as_polymorphic_paperclip_options[:styles]) unless acts_as
+          override_default_styles, normalised_styles = override_default_styles?(data_item.original_filename)
+          the_asset.data.instance_variable_set("@styles", normalised_styles) if override_default_styles
           the_asset.data = data_item
           if the_asset.save
   
@@ -86,8 +89,23 @@ module LocusFocus
             assets(true) # implicit reloading
           end
         end
+        def override_default_styles?(filename)
+          if !acts_as_polymorphic_paperclip_options[:styles].nil?
+            normalised_styles = {}
+            acts_as_polymorphic_paperclip_options[:styles].each do |name, args|
+              format = nil
+              if filename.match(/\.pdf$/) # remove crop commands if file is a PDF (this fails with Imagemagick)
+                args.gsub!(/#/ , "")
+                format = "png"
+              end
+              normalised_styles[name] = [args , format]
+            end
+            return true, normalised_styles
+          else
+            return false
+          end
+        end
       end
     end
   end
 end
-      
