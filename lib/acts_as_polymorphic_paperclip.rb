@@ -93,12 +93,13 @@ module LocusFocus
           if !acts_as_polymorphic_paperclip_options[:styles].nil?
             normalised_styles = {}
             acts_as_polymorphic_paperclip_options[:styles].each do |name, args|
-              format = nil
+              dimensions, format = [args, nil].flatten[0..1]
+              format = nil if format.blank?
               if filename.match(/\.pdf$/) # remove crop commands if file is a PDF (this fails with Imagemagick)
                 args.gsub!(/#/ , "")
                 format = "png"
               end
-              normalised_styles[name] = [args , format]
+              normalised_styles[name] = { :processors => [:thumbnail], :geometry => dimensions, :format => format }
             end
             return true, normalised_styles
           else
